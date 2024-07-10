@@ -535,7 +535,7 @@ class rref(Scene):
             Tex("-2").move_to(both["matrix"][4]),
             Tex("-4").move_to(both["matrix"][5]),
             Tex("2").move_to(both["matrix"][6]),
-            Tex("2").move_to(both["matrix"][7]),
+            Tex("-2").move_to(both["matrix"][7:9]),
         )
 
         self.wait(4)
@@ -768,6 +768,13 @@ class rref(Scene):
         )
 
         # Set up the target, and I'm lazy so I'm just gonna fade in the -3's
+        self.remove(matrix_copy2, matrix_target, text_copy2, text_target)
+        self.add(text, matrix)
+
+        text_target = Tex(
+            r"\frac{0}{-3}x+\frac{-3}{-3}y+\frac{1}{-3}z=\frac{1}{-3}"
+        ).next_to(text, DOWN)
+
         matrix_target = VGroup(
             Tex(r"\frac{0}{-3}"),
             Tex(r"\frac{-3}{-3}"),
@@ -798,8 +805,55 @@ class rref(Scene):
         matrix_target[3].shift(
             UP * (matrix_copy[3].get_y() - matrix_target[3][0][0].get_y())
         )
-        # Debugging.
-        # self.add(matrix_target.set_color(BLUE).set_opacity(0.5))
+        matrix_copy2 = VGroup()
+        for _ in range(4):
+            matrix_copy2.add(matrix_copy[1].copy())
+        text_copy2 = VGroup()
+
+        for _ in range(4):
+            text_copy2.add(VGroup(text_copy[0][2].copy(), text_copy[0][3].copy()))
+
+        # The important animation.
+        self.play(
+            # Text
+            text_copy[0][0].animate.move_to(text_target[0][0]),
+            text_copy[0][1].animate.move_to(text_target[0][4]),
+            text_copy[0][2].animate.move_to(text_target[0][6]),
+            text_copy[0][3].animate.move_to(text_target[0][7]),
+            text_copy[0][4].animate.move_to(text_target[0][11]),
+            text_copy[0][5].animate.move_to(text_target[0][12]),
+            text_copy[0][6].animate.move_to(text_target[0][13]),
+            text_copy[0][7].animate.move_to(text_target[0][17]),
+            text_copy[0][8].animate.move_to(text_target[0][18]),
+            text_copy[0][9].animate.move_to(text_target[0][19]),
+            FadeIn(text_target[0][1]),
+            FadeIn(text_target[0][5]),
+            FadeIn(text_target[0][8]),
+            FadeIn(text_target[0][14]),
+            FadeIn(text_target[0][20]),
+            text_copy2[0][0].animate.move_to(text_target[0][2]),
+            text_copy2[1][0].animate.move_to(text_target[0][9]),
+            text_copy2[2][0].animate.move_to(text_target[0][15]),
+            text_copy2[3][0].animate.move_to(text_target[0][21]),
+            text_copy2[0][1].animate.move_to(text_target[0][3]),
+            text_copy2[1][1].animate.move_to(text_target[0][10]),
+            text_copy2[2][1].animate.move_to(text_target[0][16]),
+            text_copy2[3][1].animate.move_to(text_target[0][22]),
+            # Matrix
+            matrix_copy2[0].animate.move_to(matrix_target[0][0][2:4]),
+            matrix_copy2[1].animate.move_to(matrix_target[1][0][3:5]),
+            matrix_copy2[2].animate.move_to(matrix_target[2][0][2:4]),
+            matrix_copy2[3].animate.move_to(matrix_target[3][0][2:4]),
+            FadeIn(matrix_target[0][0][1]),
+            FadeIn(matrix_target[1][0][2]),
+            FadeIn(matrix_target[2][0][1]),
+            FadeIn(matrix_target[3][0][1]),
+        )
+
+        self.remove(
+            text_copy2, matrix_copy2, text_copy, matrix_copy, text_target, matrix_target
+        )
+        self.add(text_target, matrix_target)
 
         # Add this at the end of the code to have an interactive adding and removing mobjects in real-time
         self.embed()
