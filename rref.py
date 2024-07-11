@@ -855,5 +855,106 @@ class rref(Scene):
         )
         self.add(text_target, matrix_target)
 
+        text_copy = text_target
+        matrix_copy = matrix_target
+
+        text_target = Tex(
+            *r"0   x   +   1   y   -   \frac{1}{3}   z   =   -   \frac{1}{3}".split(
+                "   "
+            )
+        ).next_to(text, DOWN)
+
+        matrix_target = VGroup(
+            Tex("0"), Tex("1"), Tex(r"-\frac{1}{3}"), Tex(r"-\frac{1}{3}")
+        ).arrange()
+        matrix_target.next_to(matrix, DOWN)
+        matrix_target[0].set_x(human_readable_matrix[2][0].get_x())
+        matrix_target[1].set_x(human_readable_matrix[2][1].get_x())
+        matrix_target[2].set_x(human_readable_matrix[2][2].get_x())
+        matrix_target[3].set_x(human_readable_matrix[3][2].get_x())
+
+        # Simplification for text side
+        self.play(
+            # Text side
+            text_copy[0][0].animate.move_to(text_target[0]),
+            text_copy[0][4].animate.move_to(text_target[1]),
+            text_copy[0][5].animate.move_to(text_target[2]),
+            text_copy[0][11].animate.move_to(text_target[4]),
+            text_copy[0][13].animate.move_to(text_target[6][0]),
+            text_copy[0][16].animate.move_to(text_target[6][2]),
+            text_copy[0][17].animate.move_to(text_target[7]),
+            text_copy[0][18].animate.move_to(text_target[8]),
+            text_copy[0][19].animate.move_to(text_target[10][0]),
+            text_copy[0][21].animate.move_to(text_target[9]),
+            text_copy[0][22].animate.move_to(text_target[10][2]),
+            Transform(text_copy[0][6:11], text_target[3]),
+            Transform(text_copy[0][14], text_target[6][1]),
+            Transform(text_copy[0][20], text_target[10][1]),
+            FadeOut(text_copy[0][12]),
+            FadeOut(text_copy[0][15]),
+            FadeOut(text_copy[0][1:4]),
+            FadeIn(text_target[5]),
+            # Matrix side
+            matrix_copy[0][0][0].animate.move_to(matrix_target[0]),
+            FadeOut(matrix_copy[0][0][1:]),
+            Transform(matrix_copy[1], matrix_target[1]),
+            matrix_copy[2][0][0].animate.move_to(matrix_target[2][0][1]),
+            Transform(matrix_copy[2][0][1], matrix_target[2][0][2]),
+            matrix_copy[2][0][2].animate.move_to(matrix_target[2][0][0]),
+            matrix_copy[3][0][0].animate.move_to(matrix_target[3][0][1]),
+            Transform(matrix_copy[3][0][1], matrix_target[3][0][2]),
+            matrix_copy[3][0][2].animate.move_to(matrix_target[3][0][0]),
+        )
+
+        self.remove(text_copy, text_target, matrix_copy, matrix_target)
+        text_copy = text_target
+        matrix_copy = matrix_target
+        self.add(text_target, matrix_target)
+
+        temp_rect = VGroup(
+            SurroundingRectangle(text[1]),
+            SurroundingRectangle(
+                VGroup(human_readable_matrix[1][0], human_readable_matrix[3][1])
+            ),
+        )
+
+        self.wait(0.75)
+        self.play(ShowCreation(temp_rect[0]), ShowCreation(temp_rect[1]), run_time=1)
+        temp_rect[0].rotate(180 * DEGREES)
+        temp_rect[1].rotate(180 * DEGREES)
+        self.play(Uncreate(temp_rect[0]), Uncreate(temp_rect[1]), run_time=1)
+
+        # TarTraRes
+        # Target
+        text_target = VGroup(
+            Tex("1x+2y-1z=1"),
+            Tex(r"0x+1y-\frac{1}{3}z=-\frac{1}{3}"),
+            Tex(r"0x-8y+3z=8"),
+        )
+        text_target.arrange(DOWN)
+
+        matrix_target = Tex(r"""\left[
+                    \begin{array}{c|c}
+                    \begin{array}{ccc}
+                    1 & 2 & -1 \\
+                    0 & 1 & -\frac{1}{3} \\
+                    0 & -8 & 3
+                    \end{array} &
+                    \begin{array}{c}
+                    1 \\
+                    -\frac{1}{3} \\
+                    8
+                    \end{array}
+                    \end{array}\right]""")
+
+        VGroup(text_target, matrix_target).arrange(buff=1).move_to(ORIGIN)
+
+        arcGroup = VGroup()
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=text_copy.get_center(), end=text_target[1].get_center(), angle=-PI
+            )
+        )
+
         # Add this at the end of the code to have an interactive adding and removing mobjects in real-time
         self.embed()
