@@ -950,11 +950,68 @@ class rref(Scene):
         VGroup(text_target, matrix_target).arrange(buff=1).move_to(ORIGIN)
 
         arcGroup = VGroup()
+        # Text
         arcGroup.add(
             ArcBetweenPoints(
                 start=text_copy.get_center(), end=text_target[1].get_center(), angle=-PI
             )
         )
+        # Matrix
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[0].get_center(),
+                end=matrix_target[0][6].get_center(),
+                angle=-PI,
+            ),
+        )
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[1].get_center(),
+                end=matrix_target[0][7].get_center(),
+                angle=-PI,
+            )
+        )
+
+        self.wait(3)
+
+        self.play(
+            text[0].animate.move_to(text_target[0]),
+            FadeOut(text[1]),
+            MoveAlongPath(text_copy, arcGroup[0]),
+            text[2].animate.move_to(text_target[2]),
+            MoveAlongPath(matrix_copy[0], arcGroup[1]),
+            MoveAlongPath(matrix_copy[1], arcGroup[2]),
+            FadeTransform(matrix_copy[2], matrix_target[0][8:12], path_arc=-PI),
+            FadeTransform(matrix_copy[3], matrix_target[0][18:22], path_arc=-PI),
+            matrix[0][0].animate.move_to(matrix_target[0][0]),
+            matrix[0][1].animate.move_to(matrix_target[0][1]),
+            matrix[0][2].animate.move_to(matrix_target[0][2]),
+            matrix[0][3].animate.move_to(matrix_target[0][3]),
+            matrix[0][4].animate.move_to(matrix_target[0][4]),
+            matrix[0][5].animate.move_to(matrix_target[0][5]),
+            matrix[0][10].animate.move_to(matrix_target[0][12]),
+            matrix[0][11].animate.move_to(matrix_target[0][13]),
+            matrix[0][12].animate.move_to(matrix_target[0][14]),
+            matrix[0][13].animate.move_to(matrix_target[0][15]),
+            matrix[0][14].animate.move_to(matrix_target[0][16]),
+            matrix[0][15].animate.move_to(matrix_target[0][17]),
+            FadeOut(matrix[0][16]),
+            FadeOut(matrix[0][6]),
+            FadeOut(matrix[0][7]),
+            FadeOut(matrix[0][8]),
+            FadeOut(matrix[0][9]),
+            matrix[0][17].animate.move_to(matrix_target[0][22]),
+            matrix[0][18].animate.move_to(matrix_target[0][23]),
+            matrix[0][19].animate.move_to(matrix_target[0][24]),
+        )
+
+        # delete everything shortcut:
+        self.clear()
+
+        matrix = matrix_target
+        text = text_target
+
+        self.add(matrix, text)
 
         # Add this at the end of the code to have an interactive adding and removing mobjects in real-time
         self.embed()
