@@ -972,7 +972,7 @@ class rref(Scene):
             )
         )
 
-        self.wait(3)
+        self.wait()
 
         self.play(
             text[0].animate.move_to(text_target[0]),
@@ -1012,6 +1012,293 @@ class rref(Scene):
         text = text_target
 
         self.add(matrix, text)
+
+        brackets = {
+            "left": matrix[0][0:2],
+            "middle": matrix[0][16],
+            "right": matrix[0][23:25],
+        }
+
+        human_readable_matrix = [
+            [matrix[0][2], matrix[0][3], matrix[0][4:6]],
+            [matrix[0][6], matrix[0][7], matrix[0][8:12]],
+            [matrix[0][12], matrix[0][13:15], matrix[0][15]],
+            [matrix[0][17], matrix[0][18:22], matrix[0][22]],
+        ]
+
+        self.wait(3)
+
+        self.play(Indicate(text[0][0][3]), Indicate(human_readable_matrix[0][1]))
+
+        # Text and Matrix duplicate. It moves down under text and matrix
+        text_copy = text[1].copy()
+        matrix_copy = VGroup(
+            *human_readable_matrix[1], human_readable_matrix[3][1]
+        ).copy()
+
+        self.add(text_copy, matrix_copy)
+        self.play(
+            text_copy.animate.next_to(text, DOWN),
+            matrix_copy.animate.next_to(matrix, DOWN),
+        )
+
+        # Adding the text_target and matrix_target(s)
+        text_target = Tex(
+            *r"-2\left(   0x + 1y - \frac{1}{3}z=- \frac{1}{3}   \right)".split("   ")
+        ).center()
+        text_target.shift(
+            np.array(
+                [
+                    text_copy.get_x() - text_target[1].get_x(),
+                    text_copy.get_y() - text_target[1].get_y(),
+                    0,
+                ]
+            )
+        )
+        matrix_target = VGroup(
+            Tex(*r"-2   \cdot   \left(   0   -\tfrac{1}{3}".split("   ")),
+            Tex("1"),
+            Tex(r"-\tfrac{1}{3}"),
+            Tex(*r"-\tfrac{1}{3}   \right)".split("   ")),
+        ).center()
+        matrix_target[0].shift(
+            matrix_copy[0].get_center() - matrix_target[0][3].get_center()
+        )
+        matrix_target[1].move_to(matrix_copy[1])
+        matrix_target[2].move_to(matrix_copy[2])
+        matrix_target[3].shift(
+            matrix_copy[0].get_center() - matrix_target[0][3].get_center()
+        )
+        matrix_target[3].shift(
+            matrix_copy[3].get_center() - matrix_target[3][0].get_center()
+        )
+
+        text_copy2 = text[0][0][3].copy()
+        matrix_copy2 = human_readable_matrix[0][1].copy()
+
+        # animation:
+        self.play(
+            FadeIn(text_target[0][0]),
+            text_copy2.animate.move_to(text_target[0][1]),
+            FadeIn(text_target[0][2]),
+            FadeIn(text_target[-1]),
+            matrix_copy2.animate.move_to(matrix_target[0][0][1]),
+            FadeIn(matrix_target[0][0][0]),
+            FadeIn(matrix_target[0][1:3]),
+            FadeIn(matrix_target[-1][1]),
+        )
+
+        self.remove(text_copy, text_copy2, text_target)
+        self.remove(matrix_copy, matrix_copy2, matrix_target)
+
+        # Sift the text_target and matrix_target
+        text_copy = Tex(
+            *r"-2\left(   0   x   +1   y   -\frac{1}{3}   z   =   -   \frac{1}{3}   \right)".split(
+                "   "
+            )
+        ).move_to(text_target)
+
+        matrix_copy = VGroup(
+            matrix_target[0][0:4], matrix_target[1], matrix_target[2], matrix_target[3]
+        )
+
+        self.add(matrix_copy, text_copy)
+
+        # TarTraRes
+        # Define target for text_target
+        text_target = Tex(
+            *r"0   x   -2   y   +\frac{2}{3}   z   =   \frac{2}{3}".split("   ")
+        ).next_to(text, DOWN)
+
+        matrix_target = VGroup(
+            Tex("0").move_to(matrix_copy[0][3]),
+            Tex("-2").move_to(matrix_copy[1]),
+            Tex(r"\tfrac{2}{3}").move_to(matrix_copy[2]),
+            Tex(r"\tfrac{2}{3}").move_to(matrix_copy[3][0]),
+        )
+
+        self.play(
+            TransformMatchingTex(text_copy, text_target),
+            FadeTransform(matrix_copy, matrix_target),
+        )
+
+        self.clear()
+        self.add(text, matrix, text_target, matrix_target)
+
+        self.wait(2)
+
+        # Move everything up because I am running out of space for that text side!!
+        self.play(*[i.animate.shift(2.5 * UP) for i in self.mobjects])
+
+        text_copy = text_target
+        matrix_copy = matrix_target
+
+        # cloning the rows
+        text_copy2 = text[0].copy()
+        matrix_copy2 = VGroup()
+        matrix_copy2.add(human_readable_matrix[0][0].copy())
+        matrix_copy2.add(human_readable_matrix[0][1].copy())
+        matrix_copy2.add(human_readable_matrix[0][2].copy())
+        matrix_copy2.add(human_readable_matrix[3][0].copy())
+
+        text_target = text_copy2.copy().next_to(text_copy, DOWN)
+        matrix_target = matrix_copy2.copy().next_to(matrix_copy, DOWN)
+
+        both = {"text": text_copy, "matrix": matrix_copy}
+
+        add_signs = {
+            "text": Tex("+").next_to(text_target, LEFT),
+            "matrix": Tex("+").next_to(matrix_target, LEFT),
+        }
+
+        underlines = {
+            "text": Line(
+                VGroup(both["text"], text_target, add_signs["text"]).get_corner(DL),
+                VGroup(both["text"], text_target, add_signs["text"]).get_corner(DR),
+            ).shift(DOWN * 0.05),
+            "matrix": Line(
+                VGroup(both["matrix"], matrix_target, add_signs["matrix"]).get_corner(
+                    DL
+                ),
+                VGroup(both["matrix"], matrix_target, add_signs["matrix"]).get_corner(
+                    DR
+                ),
+            ).shift(DOWN * 0.05),
+        }
+
+        self.play(
+            text_copy2.animate.next_to(text_copy, DOWN),
+            matrix_copy2.animate.next_to(matrix_copy, DOWN),
+            FadeIn(underlines["text"]),
+            FadeIn(underlines["matrix"]),
+            FadeIn(add_signs["text"]),
+            FadeIn(add_signs["matrix"]),
+        )
+
+        text_target = Tex(r"1x+0y-\frac{1}{3}z=\frac{5}{3}").next_to(
+            underlines["text"], DOWN
+        )
+        matrix_target = VGroup(
+            Tex("1")
+            .next_to(underlines["matrix"], DOWN)
+            .set_x(both["matrix"][0].get_x()),
+            Tex("0")
+            .next_to(underlines["matrix"], DOWN)
+            .set_x(both["matrix"][1].get_x()),
+            Tex(r"-\frac{1}{3}")
+            .next_to(underlines["matrix"], DOWN)
+            .set_x(both["matrix"][2].get_x()),
+            Tex(r"\frac{5}{3}")
+            .next_to(underlines["matrix"], DOWN)
+            .set_x(both["matrix"][3].get_x()),
+        )
+
+        self.play(FadeIn(text_target), FadeIn(matrix_target))
+
+        self.play(
+            FadeOut(
+                VGroup(
+                    *add_signs.values(),
+                    *underlines.values(),
+                    text_copy,
+                    text_copy2,
+                    matrix_copy,
+                    matrix_copy2,
+                )
+            ),
+            matrix_target.animate.next_to(matrix, DOWN),
+            text_target.animate.next_to(text, DOWN),
+        )
+
+        temp_rect = VGroup(
+            SurroundingRectangle(
+                VGroup(*human_readable_matrix[0], human_readable_matrix[3][0])
+            ),
+            SurroundingRectangle(text[0]),
+        )
+
+        self.play(ShowCreation(temp_rect[0]), ShowCreation(temp_rect[1]))
+        temp_rect[0].rotate(180 * DEGREES)
+        temp_rect[1].rotate(180 * DEGREES)
+        self.play(Uncreate(temp_rect[0]), Uncreate(temp_rect[1]))
+        self.wait(0.5)
+
+        # Target
+        text_copy = text_target
+        matrix_copy = matrix_target
+
+        text_target = VGroup(
+            Tex(r"1x+0y-\frac{1}{3}z=\frac{5}{3}"),
+            Tex(r"0x+1y-\frac{1}{3}z=-\frac{1}{3}"),
+            Tex(r"0x-8y+3z=8"),
+        )
+        text_target.arrange(DOWN)
+
+        matrix_target = Tex(r"""\left[
+                    \begin{array}{c|c}
+                    \begin{array}{ccc}
+                    1 & 0 & -\frac{1}{3} \\
+                    0 & 1 & -\frac{1}{3} \\
+                    0 & -8 & 3
+                    \end{array} &
+                    \begin{array}{c}
+                    \frac{5}{3} \\
+                    -\frac{1}{3} \\
+                    8
+                    \end{array}
+                    \end{array}\right]""")
+
+        VGroup(text_target, matrix_target).arrange(buff=1).move_to(ORIGIN).shift(
+            UP * 2.5
+        )
+
+        arcGroup = VGroup()
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=text_copy.get_center(),
+                end=text_target[0].get_center(),
+                angle=-PI,
+            ),
+        )
+
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[0].get_center(),
+                end=matrix_target[0][2].get_center(),
+                angle=-PI,
+            )
+        )
+
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[1].get_center(),
+                end=matrix_target[0][3].get_center(),
+                angle=-PI,
+            )
+        )
+
+        # Transform
+        self.play(
+            FadeOut(text[0]),
+            text[1].animate.move_to(text_target[1]),
+            text[2].animate.move_to(text_target[2]),
+            FadeTransform(matrix_copy[2], matrix_target[0][4:8], path_arc=-PI),
+            FadeTransform(matrix_copy[3], matrix_target[0][19:22], path_arc=-PI),
+            MoveAlongPath(text_copy, arcGroup[0]),
+            FadeOut(text[0]),
+            MoveAlongPath(matrix_copy[0], arcGroup[1]),
+            MoveAlongPath(matrix_copy[1], arcGroup[2]),
+            FadeOut(human_readable_matrix[0][0]),
+            FadeOut(human_readable_matrix[0][1]),
+            FadeOut(human_readable_matrix[0][2]),
+            FadeOut(human_readable_matrix[3][0]),
+        )
+
+        # Result
+        self.remove(matrix, text)
+        text = text_target
+        matrix = matrix_target
+        self.add(text, matrix)
 
         # Add this at the end of the code to have an interactive adding and removing mobjects in real-time
         self.embed()
