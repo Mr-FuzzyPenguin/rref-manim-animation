@@ -1531,6 +1531,19 @@ class rref(Scene):
             )
         )
 
+        temp_rect = VGroup(
+            SurroundingRectangle(
+                VGroup(*human_readable_matrix[2], human_readable_matrix[3][2])
+            ),
+            SurroundingRectangle(text[2]),
+        )
+
+        self.play(ShowCreation(temp_rect[0]), ShowCreation(temp_rect[1]))
+        temp_rect[0].rotate(180 * DEGREES)
+        temp_rect[1].rotate(180 * DEGREES)
+        self.play(Uncreate(temp_rect[0]), Uncreate(temp_rect[1]))
+        self.wait(0.5)
+
         self.play(
             text[0:2].animate.move_to(text_target[0:2]),
             *[matrix[0][i].animate.move_to(matrix_target[0][i]) for i in range(0, 14)],
@@ -1547,6 +1560,552 @@ class rref(Scene):
             MoveAlongPath(matrix_copy[1], arcGroup[2]),
             MoveAlongPath(matrix_copy[2], arcGroup[3]),
             MoveAlongPath(matrix_copy[3], arcGroup[4]),
+        )
+
+        self.clear()
+        matrix = matrix_target
+        text = text_target
+
+        self.add(matrix, text)
+
+        # COLUMN RECTANGLE!
+        temp_rect = VGroup(
+            SurroundingRectangle(
+                VGroup(matrix[0][4:8], matrix[0][10:14], matrix[0][16:19])
+            ),
+            SurroundingRectangle(
+                VGroup(text[0][0][5:10], text[1][0][5:10], text[2][0][5:10])
+            ),
+        )
+
+        self.play(ShowCreation(temp_rect[0]), ShowCreation(temp_rect[1]))
+        temp_rect[0].rotate(180 * DEGREES)
+        temp_rect[1].rotate(180 * DEGREES)
+        self.play(Uncreate(temp_rect[0]), Uncreate(temp_rect[1]))
+        self.wait(0.5)
+
+        self.play(VGroup(text, matrix).animate.center().shift(UP))
+        temp_text = Text("Here's an interesting shortcut!").next_to(
+            VGroup(text, matrix), UP
+        )
+        self.play(Write(temp_text, stroke_color=WHITE))
+
+        self.wait(3)
+        self.play(FadeOut(temp_text))
+
+        temp_text = Text(
+            "We can just add those rows together (despite not being a 1)!"
+        ).next_to(VGroup(text, matrix), UP)
+        self.play(Write(temp_text, stroke_color=WHITE))
+        self.wait()
+        self.play(FadeOut(temp_text))
+
+        matrix_copy = VGroup(
+            matrix[0][14], matrix[0][15], matrix[0][16:19], matrix[0][27:31]
+        ).copy()
+        text_copy = text[2].copy()
+
+        text_target = text_copy.copy().next_to(text, DOWN)
+
+        self.play(
+            matrix_copy.animate.set_y(text_target.get_y()),
+            text_copy.animate.set_y(text_target.get_y()),
+        )
+
+        matrix_copy2 = VGroup(
+            matrix[0][2], matrix[0][3], matrix[0][4:8], matrix[0][20:23]
+        ).copy()
+        text_copy2 = text[0].copy()
+
+        text_target = text_copy2.copy().next_to(text_copy, DOWN)
+        matrix_target = matrix_copy2.copy().next_to(matrix_copy, DOWN)
+
+        add_signs = {
+            "text": Tex("+").next_to(text_target, LEFT),
+            "matrix": Tex("+").next_to(matrix_target, LEFT),
+        }
+
+        underlines = {
+            "text": Line(
+                VGroup(text_copy, text_target, add_signs["text"]).get_corner(DL),
+                VGroup(text_copy, text_target, add_signs["text"]).get_corner(DR),
+            ).shift(DOWN * 0.05),
+            "matrix": Line(
+                VGroup(matrix_copy, matrix_target, add_signs["matrix"]).get_corner(DL),
+                VGroup(matrix_copy, matrix_target, add_signs["matrix"]).get_corner(DR),
+            ).shift(DOWN * 0.05),
+        }
+
+        self.play(
+            text_copy2.animate.move_to(text_target),
+            matrix_copy2.animate.move_to(matrix_target),
+            *[FadeIn(i) for i in list(underlines.values()) + list(add_signs.values())],
+        )
+
+        text_target = Tex("1x+0y+0z=7").next_to(text_copy2, DOWN)
+        matrix_target = VGroup(
+            Tex("1").next_to(underlines["matrix"], DOWN).set_x(matrix_copy2[0].get_x()),
+            Tex("0").next_to(underlines["matrix"], DOWN).set_x(matrix_copy2[1].get_x()),
+            Tex("0").next_to(underlines["matrix"], DOWN).set_x(matrix_copy2[2].get_x()),
+            Tex("7").next_to(underlines["matrix"], DOWN).set_x(matrix_copy2[3].get_x()),
+        )
+
+        self.play(FadeIn(text_target), FadeIn(matrix_target))
+
+        self.play(
+            *[FadeOut(i) for i in list(underlines.values()) + list(add_signs.values())],
+            FadeOut(text_copy),
+            FadeOut(text_copy2),
+            FadeOut(matrix_copy),
+            FadeOut(matrix_copy2),
+            text_target.animate.next_to(text, DOWN),
+            matrix_target.animate.set_y(text_target.copy().next_to(text, DOWN).get_y()),
+        )
+
+        text_copy = text_target
+        matrix_copy = matrix_target
+
+        temp_rect = VGroup(
+            SurroundingRectangle(VGroup(matrix[0][2:8], matrix[0][20:23])),
+            SurroundingRectangle(text[0]),
+        )
+
+        self.play(ShowCreation(temp_rect[0]), ShowCreation(temp_rect[1]))
+        temp_rect[0].rotate(180 * DEGREES)
+        temp_rect[1].rotate(180 * DEGREES)
+        self.play(Uncreate(temp_rect[0]), Uncreate(temp_rect[1]))
+        self.wait(0.5)
+
+        text_target = VGroup(
+            Tex(r"1x+0y+0z=7"),
+            Tex(r"0x+1y-\frac{1}{3}z=-\frac{1}{3}"),
+            Tex(r"0x+0y+\frac{1}{3}z=\frac{16}{3}"),
+        )
+        text_target.arrange(DOWN).center()
+
+        matrix_target = (
+            Tex(r"""\left[
+                    \begin{array}{c|c}
+                    \begin{array}{ccc}
+                    1 & 0 & 0 \\
+                    0 & 1 & -\frac{1}{3} \\
+                    0 & 0 & \frac{1}{3}
+                    \end{array} &
+                    \begin{array}{c}
+                    7 \\
+                    -\frac{1}{3} \\
+                    \frac{16}{3}
+                    \end{array}
+                    \end{array}\right]""")
+            .next_to(text_target, RIGHT, buff=1)
+            .center()
+        )
+
+        VGroup(text_target, matrix_target).arrange(buff=1).move_to(ORIGIN).shift(
+            UP * 0.75
+        )
+
+        arcGroup = VGroup()
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=text_copy.get_center(), end=text_target[0].get_center(), angle=-PI
+            )
+        )
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[0].get_center(),
+                end=matrix_target[0][2].get_center(),
+                angle=-PI,
+            )
+        )
+
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[1].get_center(),
+                end=matrix_target[0][3].get_center(),
+                angle=-PI,
+            )
+        )
+
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[2].get_center(),
+                end=matrix_target[0][4].get_center(),
+                angle=-PI,
+            )
+        )
+
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[3].get_center(),
+                end=matrix_target[0][17].get_center(),
+                angle=-PI,
+            )
+        )
+
+        self.play(
+            FadeOut(text[0]),
+            text[1].animate.move_to(text_target[1]),
+            text[2].animate.move_to(text_target[2]),
+            MoveAlongPath(text_copy, arcGroup[0]),
+            *[MoveAlongPath(matrix_copy[i - 1], arcGroup[i]) for i in range(1, 5)],
+            FadeOut(matrix[0][2:8]),
+            FadeOut(matrix[0][20:23]),
+            matrix[0][0].animate.move_to(matrix_target[0][0]),
+            matrix[0][1].animate.move_to(matrix_target[0][1]),
+            matrix[0][8:19].animate.move_to(matrix_target[0][5:16]),
+            matrix[0][19].animate.move_to(matrix_target[0][16]),
+            matrix[0][23:33].animate.move_to(matrix_target[0][18:28]),
+        )
+
+        self.clear()
+
+        text = text_target
+        matrix = matrix_target
+        text_copy = text[1].copy()
+        matrix_copy = VGroup(matrix[0][5:11], matrix[0][18:22]).copy()
+
+        text_copy2 = text[2].copy()
+        matrix_copy2 = VGroup(
+            matrix[0][11], matrix[0][12], matrix[0][13:16], matrix[0][22:26]
+        ).copy()
+
+        self.add(matrix, text)
+
+        self.play(
+            text_copy.animate.next_to(text, DOWN),
+            matrix_copy.animate.set_y(text_copy.copy().next_to(text, DOWN).get_y()),
+        )
+
+        text_target = text_copy2.copy().next_to(text_copy, DOWN)
+        matrix_target = matrix_copy2.copy().next_to(matrix_copy, DOWN)
+
+        add_signs = {
+            "text": Tex("+").next_to(text_target, LEFT),
+            "matrix": Tex("+").next_to(matrix_target, LEFT),
+        }
+
+        underlines = {
+            "text": Line(
+                VGroup(text_copy, text_target, add_signs["text"]).get_corner(DL),
+                VGroup(text_copy, text_target, add_signs["text"]).get_corner(DR),
+            ).shift(DOWN * 0.05),
+            "matrix": Line(
+                VGroup(matrix_copy, matrix_target, add_signs["matrix"]).get_corner(DL),
+                VGroup(matrix_copy, matrix_target, add_signs["matrix"]).get_corner(DR),
+            ).shift(DOWN * 0.05),
+        }
+
+        self.play(
+            text_copy2.animate.next_to(text_copy, DOWN),
+            matrix_copy2.animate.next_to(matrix_copy, DOWN),
+            *[FadeIn(i) for i in list(underlines.values()) + list(add_signs.values())],
+        )
+
+        text_target = Tex("0x+1y+0z=5").next_to(text_copy2, DOWN)
+        matrix_target = VGroup(
+            Tex("0").next_to(underlines["matrix"], DOWN).set_x(matrix_copy2[0].get_x()),
+            Tex("1").next_to(underlines["matrix"], DOWN).set_x(matrix_copy2[1].get_x()),
+            Tex("0").next_to(underlines["matrix"], DOWN).set_x(matrix_copy2[2].get_x()),
+            Tex("5").next_to(underlines["matrix"], DOWN).set_x(matrix_copy2[3].get_x()),
+        )
+
+        self.play(FadeIn(text_target), FadeIn(matrix_target))
+
+        self.play(
+            FadeOut(text_copy),
+            FadeOut(text_copy2),
+            FadeOut(matrix_copy),
+            FadeOut(matrix_copy2),
+            *[FadeOut(i) for i in list(underlines.values()) + list(add_signs.values())],
+            text_target.animate.next_to(text, DOWN),
+            matrix_target.animate.set_y(text_target.copy().next_to(text, DOWN).get_y()),
+        )
+
+        temp_rect = VGroup(
+            SurroundingRectangle(VGroup(matrix[0][5:11], matrix[0][18:22])),
+            SurroundingRectangle(text[1]),
+        )
+
+        self.play(ShowCreation(temp_rect[0]), ShowCreation(temp_rect[1]))
+        temp_rect[0].rotate(180 * DEGREES)
+        temp_rect[1].rotate(180 * DEGREES)
+        self.play(Uncreate(temp_rect[0]), Uncreate(temp_rect[1]))
+        self.wait(0.5)
+
+        text_copy = text_target
+        matrix_copy = matrix_target
+
+        text_target = VGroup(
+            Tex(r"1x+0y+0z=7"),
+            Tex(r"0x+1y+0z=5"),
+            Tex(r"0x+0y+\frac{1}{3}z=\frac{16}{3}"),
+        )
+        text_target.arrange(DOWN).center()
+
+        matrix_target = (
+            Tex(r"""\left[
+                    \begin{array}{c|c}
+                    \begin{array}{ccc}
+                    1 & 0 & 0 \\
+                    0 & 1 & 0 \\
+                    0 & 0 & \frac{1}{3}
+                    \end{array} &
+                    \begin{array}{c}
+                    7 \\
+                    5 \\
+                    \frac{16}{3}
+                    \end{array}
+                    \end{array}\right]""")
+            .next_to(text_target, RIGHT, buff=1)
+            .center()
+        )
+
+        VGroup(text_target, matrix_target).arrange(buff=1).move_to(ORIGIN).shift(
+            UP * 0.75
+        )
+
+        arcGroup = VGroup()
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=text_copy.get_center(), end=text_target[1].get_center(), angle=-PI
+            )
+        )
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[0].get_center(),
+                end=matrix_target[0][5].get_center(),
+                angle=-PI,
+            )
+        )
+
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[1].get_center(),
+                end=matrix_target[0][6].get_center(),
+                angle=-PI,
+            )
+        )
+
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[2].get_center(),
+                end=matrix_target[0][7].get_center(),
+                angle=-PI,
+            )
+        )
+
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[3].get_center(),
+                end=matrix_target[0][15].get_center(),
+                angle=-PI,
+            )
+        )
+
+        self.play(
+            FadeOut(text[1]),
+            text[0].animate.move_to(text_target[0]),
+            text[2].animate.move_to(text_target[2]),
+            MoveAlongPath(text_copy, arcGroup[0]),
+            FadeOut(matrix[0][5:11]),
+            FadeOut(matrix[0][18:22]),
+            matrix[0][0:2].animate.move_to(matrix_target[0][0:2]),
+            matrix[0][2].animate.move_to(matrix_target[0][2]),
+            matrix[0][3].animate.move_to(matrix_target[0][3]),
+            matrix[0][4].animate.move_to(matrix_target[0][4]),
+            matrix[0][11].animate.move_to(matrix_target[0][8]),
+            matrix[0][12].animate.move_to(matrix_target[0][9]),
+            matrix[0][13].animate.move_to(matrix_target[0][10]),
+            matrix[0][14].animate.move_to(matrix_target[0][11]),
+            matrix[0][15].animate.move_to(matrix_target[0][12]),
+            matrix[0][16].animate.move_to(matrix_target[0][13]),
+            matrix[0][17].animate.move_to(matrix_target[0][14]),
+            matrix[0][22].animate.move_to(matrix_target[0][16]),
+            matrix[0][23].animate.move_to(matrix_target[0][17]),
+            matrix[0][24].animate.move_to(matrix_target[0][18]),
+            matrix[0][25].animate.move_to(matrix_target[0][19]),
+            matrix[0][26].animate.move_to(matrix_target[0][20]),
+            matrix[0][27].animate.move_to(matrix_target[0][21]),
+            *[MoveAlongPath(matrix_copy[i - 1], arcGroup[i]) for i in range(1, 5)],
+        )
+
+        self.clear()
+        text = text_target
+        matrix = matrix_target
+
+        self.add(text, matrix)
+
+        text_copy = text[2].copy()
+        matrix_copy = VGroup(
+            matrix[0][8], matrix[0][9], matrix[0][10:13], matrix[0][16:20]
+        ).copy()
+
+        text_target = Tex(
+            "3\left(",
+            "0x+0y+{",
+            "1",
+            "\over",
+            "3",
+            "}",
+            "z={",
+            "16",
+            "\over",
+            "3",
+            "}",
+            r"\right)",
+        ).next_to(text, DOWN)
+        text_target.shift(RIGHT * (text[2].get_x() - text_target[1:9].get_x()))
+
+        matrix_target = Tex(
+            "3\cdot \left(", "0", r"0\tfrac{1}{3}\tfrac{16}{3}", r"\right)"
+        ).next_to(matrix, DOWN)
+        matrix_target[0:2].shift(
+            RIGHT * (matrix[0][8].get_x() - matrix_target[1].get_x())
+        )
+        matrix_target[2][0].set_x(matrix[0][9].get_x())
+        matrix_target[2][1:4].set_x(matrix[0][10:13].get_x())
+        VGroup(matrix_target[2][4:8], matrix_target[3]).shift(
+            RIGHT * (matrix[0][16:20].get_x() - VGroup(matrix_target[2][4:8]).get_x())
+        )
+
+        self.play(
+            text_copy.animate.move_to(text_target[1:-1]),
+            matrix_copy.animate.move_to(matrix_target[1:3]),
+            FadeIn(text_target[0]),
+            FadeIn(text_target[-1]),
+            FadeIn(matrix_target[0]),
+            FadeIn(matrix_target[-1]),
+        )
+
+        text_copy = text_target
+        matrix_copy = matrix_target
+
+        self.clear()
+        self.add(text, matrix, text_copy, matrix_copy)
+
+        text_target = Tex("0x+0y+{", "1", "z={", "16", "}}").move_to(text_copy[1:-1])
+        matrix_target = VGroup(
+            matrix_copy[1],
+            matrix_copy[2][0],
+            Tex("1").move_to(matrix_copy[2][1:4]),
+            Tex("16").move_to(matrix_copy[2][4:8]),
+        )
+
+        self.play(
+            TransformMatchingTex(text_copy, text_target),
+            FadeOut(matrix_copy[0]),
+            FadeOut(matrix_copy[3]),
+            FadeTransform(matrix_copy[2][1], matrix_target[2]),
+            FadeOut(matrix_copy[2][2:4]),
+            FadeTransform(matrix_copy[2][4:6], matrix_target[3]),
+            FadeOut(matrix_copy[2][6:8]),
+        )
+
+        self.clear()
+        self.add(text, matrix, text_target, matrix_target)
+
+        text_copy = text_target
+        matrix_copy = matrix_target
+
+        temp_rect = VGroup(
+            SurroundingRectangle(VGroup(matrix[0][8:13], matrix[0][16:20])),
+            SurroundingRectangle(text[2]),
+        )
+
+        self.play(ShowCreation(temp_rect[0]), ShowCreation(temp_rect[1]))
+        temp_rect[0].rotate(180 * DEGREES)
+        temp_rect[1].rotate(180 * DEGREES)
+        self.play(Uncreate(temp_rect[0]), Uncreate(temp_rect[1]))
+        self.wait(0.5)
+
+        text_target = VGroup(
+            Tex(r"1x+0y+0z=7"),
+            Tex(r"0x+1y+0z=5"),
+            Tex(r"0x+0y+1z=16"),
+        )
+        text_target.arrange(DOWN).center()
+
+        matrix_target = (
+            Tex(r"""\left[
+                    \begin{array}{c|c}
+                    \begin{array}{ccc}
+                    1 & 0 & 0 \\
+                    0 & 1 & 0 \\
+                    0 & 0 & 1
+                    \end{array} &
+                    \begin{array}{c}
+                    7 \\
+                    5 \\
+                    16
+                    \end{array}
+                    \end{array}\right]""")
+            .next_to(text_target, RIGHT, buff=1)
+            .center()
+        )
+
+        VGroup(text_target, matrix_target).arrange(buff=1).move_to(ORIGIN).shift(
+            UP * 0.75
+        )
+
+        arcGroup = VGroup()
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=text_copy.get_center(), end=text_target[2].get_center(), angle=-PI
+            )
+        )
+
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[0].get_center(),
+                end=matrix_target[0][8].get_center(),
+                angle=-PI,
+            )
+        )
+
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[1].get_center(),
+                end=matrix_target[0][9].get_center(),
+                angle=-PI,
+            )
+        )
+
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[2].get_center(),
+                end=matrix_target[0][10].get_center(),
+                angle=-PI,
+            )
+        )
+
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[3].get_center(),
+                end=matrix_target[0][14:16].get_center(),
+                angle=-PI,
+            )
+        )
+
+        self.play(
+            text[0].animate.move_to(text_target[0]),
+            text[1].animate.move_to(text_target[1]),
+            FadeOut(text[2]),
+            FadeOut(matrix[0][8:13]),
+            FadeOut(matrix[0][16:20]),
+            matrix[0][0:2].animate.move_to(matrix_target[0][0:2]),
+            matrix[0][2].animate.move_to(matrix_target[0][2]),
+            matrix[0][3].animate.move_to(matrix_target[0][3]),
+            matrix[0][4].animate.move_to(matrix_target[0][4]),
+            matrix[0][5].animate.move_to(matrix_target[0][5]),
+            matrix[0][6].animate.move_to(matrix_target[0][6]),
+            matrix[0][7].animate.move_to(matrix_target[0][7]),
+            matrix[0][13].animate.move_to(matrix_target[0][11]),
+            matrix[0][14].animate.move_to(matrix_target[0][12]),
+            matrix[0][15].animate.move_to(matrix_target[0][13]),
+            matrix[0][-2:].animate.move_to(matrix_target[0][-2:]),
+            MoveAlongPath(text_copy, arcGroup[0]),
+            *[MoveAlongPath(matrix_copy[i - 1], arcGroup[i]) for i in range(1, 5)],
         )
 
         # Add this at the end of the code to have an interactive adding and removing mobjects in real-time
