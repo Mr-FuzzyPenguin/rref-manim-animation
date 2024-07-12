@@ -1300,5 +1300,254 @@ class rref(Scene):
         matrix = matrix_target
         self.add(text, matrix)
 
+        text_copy = text[1].copy()
+        matrix_copy = VGroup(matrix[0][8:14].copy(), matrix[0][22:26].copy())
+
+        self.add(text_copy, matrix_copy)
+
+        self.clear()
+        self.add(matrix, text, matrix_copy, text_copy)
+
+        self.play(
+            text_copy.animate.next_to(text, DOWN, buff=0.5),
+            matrix_copy.animate.set_x(matrix.get_x()).set_y(
+                text_copy.copy().next_to(text, DOWN, buff=0.5).get_y()
+            ),
+        )
+
+        text_target = (
+            Tex(r"8 \left(", r"0x+1y-\frac{1}{3}z=-\frac{1}{3}", r"\right)")
+            .center()
+            .shift(text_copy.get_center() - text_target[1].get_center())
+        )
+
+        matrix_target = Tex(
+            "8 \cdot \left(", "0", "1", r"-\tfrac{1}{3}", r"-\tfrac{1}{3}", r"\right)"
+        )
+
+        text_target.shift(text_copy.get_center() - text_target[1].get_center())
+
+        (
+            matrix_target[0:2].shift(
+                matrix_copy[0][0].get_center() - matrix_target[1].get_center()
+            ),
+        )
+        (matrix_target[2].move_to(matrix_copy[0][1]),)
+        (matrix_target[3][0].move_to(matrix_copy[0][2]),)
+        (matrix_target[3][1:].move_to(matrix_copy[0][3:]),)
+        (matrix_target[4][0].move_to(matrix_copy[1][0]),)
+        (matrix_target[4][0].move_to(matrix_copy[1][0]),)
+        (
+            VGroup(matrix_target[4][1:4], matrix_target[5]).shift(
+                matrix_copy[1][1:4].get_center() - matrix_target[4][1:4].get_center()
+            ),
+        )
+
+        text_copy2 = text[2][0][3].copy()
+        matrix_copy2 = matrix[0][16].copy()
+
+        self.play(
+            FadeIn(text_target[0][1:]),
+            FadeIn(text_target[2]),
+            FadeIn(matrix_target[0][1:]),
+            FadeIn(matrix_target[5]),
+            text_copy2.animate.move_to(text_target[0][0]),
+            matrix_copy2.animate.move_to(matrix_target[0][0]),
+        )
+
+        self.clear()
+        text_copy = text_target
+        matrix_copy = matrix_target
+        self.add(matrix, text, text_copy, matrix_copy)
+
+        text_target = Tex(r"0x+8y-\frac{8}{3}z=-\frac{8}{3}").move_to(text_copy[1])
+        matrix_target = VGroup()
+        matrix_target.add(Tex("0").move_to(matrix_copy[1]))
+        matrix_target.add(Tex("8").move_to(matrix_copy[2]))
+        matrix_target.add(Tex(r"-\tfrac{8}{3}").move_to(matrix_copy[3]))
+        matrix_target.add(Tex(r"-\tfrac{8}{3}").move_to(matrix_copy[4]))
+
+        self.play(
+            # Text
+            FadeIn(text_target[0][3]),
+            FadeIn(text_target[0][6]),
+            FadeIn(text_target[0][12]),
+            FadeOut(text_copy[0]),
+            FadeOut(text_copy[2]),
+            FadeOut(text_copy[1][3]),
+            FadeOut(text_copy[1][6]),
+            FadeOut(text_copy[1][12]),
+            # Matrix
+            FadeOut(matrix_copy[0]),
+            FadeOut(matrix_copy[-1]),
+            FadeTransform(matrix_copy[2], matrix_target[1]),
+            FadeTransform(matrix_copy[3], matrix_target[2]),
+            FadeTransform(matrix_copy[4], matrix_target[3]),
+        )
+
+        self.remove(matrix_target, text_target, text_copy, matrix_copy)
+        self.add(matrix_target, text_target)
+
+        text_copy = text_target
+        matrix_copy = matrix_target
+
+        text_copy2 = text[2].copy()
+        matrix_copy2 = VGroup(
+            *[matrix[0][i] for i in range(14, 18)], matrix[0][26]
+        ).copy()
+
+        add_signs = {
+            "text": Tex("+").next_to(text_copy2.copy().next_to(text_copy, DOWN), LEFT),
+            "matrix": Tex("+").next_to(
+                matrix_copy2.copy().next_to(matrix_copy, DOWN), LEFT
+            ),
+        }
+
+        underlines = {
+            "text": Line(
+                VGroup(add_signs["text"], text_copy2, text_copy).get_corner(DL),
+                VGroup(add_signs["text"], text_copy2, text_copy).get_corner(DR),
+            ).shift(DOWN * 0.07),
+            "matrix": Line(
+                VGroup(add_signs["matrix"], matrix_copy2, matrix_copy).get_corner(DL),
+                VGroup(add_signs["matrix"], matrix_copy2, matrix_copy).get_corner(DR),
+            ).shift(DOWN * 0.07),
+        }
+
+        self.play(
+            text_copy2.animate.next_to(text_copy, DOWN),
+            matrix_copy2.animate.next_to(matrix_copy, DOWN),
+            FadeIn(VGroup(*underlines.values(), *add_signs.values())),
+        )
+
+        text_target = Tex(r"0x+0y+\frac{1}{3}z=\frac{16}{3}").next_to(
+            underlines["text"], DOWN
+        )
+        matrix_target = VGroup(
+            Tex("0").next_to(underlines["matrix"], DOWN).set_x(matrix_copy2[0].get_x()),
+            Tex("0")
+            .next_to(underlines["matrix"], DOWN)
+            .set_x(matrix_copy2[1:3].get_x()),
+            Tex(r"\tfrac{1}{3}")
+            .next_to(underlines["matrix"], DOWN)
+            .set_x(matrix_copy2[3].get_x()),
+            Tex(r"\tfrac{16}{3}")
+            .next_to(underlines["matrix"], DOWN)
+            .set_x(matrix_copy2[4].get_x()),
+        )
+
+        self.play(FadeIn(text_target), FadeIn(matrix_target))
+
+        self.play(
+            FadeOut(text_copy),
+            FadeOut(text_copy2),
+            FadeOut(underlines["text"]),
+            FadeOut(add_signs["text"]),
+            FadeOut(matrix_copy),
+            FadeOut(matrix_copy2),
+            FadeOut(underlines["matrix"]),
+            FadeOut(add_signs["matrix"]),
+            matrix_target.animate.shift(
+                UP * (text_copy.get_y() - matrix_target.get_y())
+            ),
+            text_target.animate.shift(UP * (text_copy.get_y() - text_target.get_y())),
+        )
+
+        text_copy = text_target
+        matrix_copy = matrix_target
+
+        # TarTraRes
+        # Target
+        text_target = VGroup(
+            Tex(r"1x+0y-\frac{1}{3}z=\frac{5}{3}"),
+            Tex(r"0x+1y-\frac{1}{3}z=-\frac{1}{3}"),
+            Tex(r"0x+0y+\frac{1}{3}z=\frac{16}{3}"),
+        )
+        text_target.arrange(DOWN)
+
+        matrix_target = Tex(r"""\left[
+                    \begin{array}{c|c}
+                    \begin{array}{ccc}
+                    1 & 0 & -\frac{1}{3} \\
+                    0 & 1 & -\frac{1}{3} \\
+                    0 & 0 & \frac{1}{3}
+                    \end{array} &
+                    \begin{array}{c}
+                    \frac{5}{3} \\
+                    -\frac{1}{3} \\
+                    \frac{16}{3}
+                    \end{array}
+                    \end{array}\right]""").next_to(text_target, RIGHT, buff=1)
+
+        VGroup(text_target, matrix_target).center().shift(UP * 2)
+
+        arcGroup = VGroup()
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=text_copy.get_center(),
+                end=text_target[2].get_center(),
+                angle=-PI,
+            )
+        )
+
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[0].get_center(),
+                end=matrix_target[0][14].get_center(),
+                angle=-PI,
+            )
+        )
+
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[1].get_center(),
+                end=matrix_target[0][15].get_center(),
+                angle=-PI,
+            )
+        )
+
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[2].get_center(),
+                end=VGroup(
+                    matrix_target[0][16],
+                    matrix_target[0][17],
+                    matrix_target[0][18],
+                ).get_center(),
+                angle=-PI,
+            )
+        )
+
+        arcGroup.add(
+            ArcBetweenPoints(
+                start=matrix_copy[3].get_center(),
+                end=VGroup(
+                    matrix_target[0][27],
+                    matrix_target[0][28],
+                    matrix_target[0][29],
+                    matrix_target[0][30],
+                ).get_center(),
+                angle=-PI,
+            )
+        )
+
+        self.play(
+            text[0:2].animate.move_to(text_target[0:2]),
+            *[matrix[0][i].animate.move_to(matrix_target[0][i]) for i in range(0, 14)],
+            matrix[0][18].animate.move_to(matrix_target[0][19]),
+            matrix[0][27].animate.move_to(matrix_target[0][31]),
+            matrix[0][28].animate.move_to(matrix_target[0][32]),
+            matrix[0][19:22].animate.move_to(matrix_target[0][20:23]),
+            matrix[0][22:26].animate.move_to(matrix_target[0][23:27]),
+            FadeOut(text[2]),
+            FadeOut(matrix[0][14:18]),
+            FadeOut(matrix[0][26]),
+            MoveAlongPath(text_copy, arcGroup[0]),
+            MoveAlongPath(matrix_copy[0], arcGroup[1]),
+            MoveAlongPath(matrix_copy[1], arcGroup[2]),
+            MoveAlongPath(matrix_copy[2], arcGroup[3]),
+            MoveAlongPath(matrix_copy[3], arcGroup[4]),
+        )
+
         # Add this at the end of the code to have an interactive adding and removing mobjects in real-time
         self.embed()
