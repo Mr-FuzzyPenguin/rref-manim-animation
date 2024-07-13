@@ -208,7 +208,7 @@ class rref(Scene):
         self.play(
             *[
                 Indicate(matrix[0][i], color=BLUE)
-                for i in range(2, 14)
+                for i in range(3, 14)
                 if i not in [8, 9]
             ],
             Indicate(text[0][0][3], color=BLUE),
@@ -2107,6 +2107,8 @@ class rref(Scene):
             MoveAlongPath(text_copy, arcGroup[0]),
             *[MoveAlongPath(matrix_copy[i - 1], arcGroup[i]) for i in range(1, 5)],
         )
+
+        self.wait(20)
 
         # Add this at the end of the code to have an interactive adding and removing mobjects in real-time
         self.embed()
